@@ -1,10 +1,12 @@
+import React from 'react'
 import Password from './Password'
 
-function App() {
+const App = () => {
   return (
+    <div className='flex justify-center items-center h-screen w-screen '>
       <Password/>
-
-  );
+    </div>
+  )
 }
 
-export default App;
+export default App

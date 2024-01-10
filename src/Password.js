@@ -1,117 +1,98 @@
-import "./index.css";
-import { useState } from "react";
-
-export default function Password() {
-  //todo ----- Declair state varriable -----
-  let [length, setLength] = useState(8);
-  let [lowerChar, setLowerChar] = useState(false);
-  let [upperChar, setUpperChar] = useState(false);
-  let [number, setNumber] = useState(false);
-  let [symbol, setSymbol] = useState(false);
-
-  //todo ----- set arrays for different catagories -----
-  const lowerCaseArray = "abcdefghijklmnopqrstuvwxyz";
-  const upperCaseArray = lowerCaseArray.toUpperCase();
-  const numberArray = "0123456789";
-  const symbolArray = "!@#$%^&*()_+=-{}|[]\\:;\"'<>,.?/";
+import React, { useState, useRef, useCallback } from "react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 
 
-    //todo ----- create a string -----
-    function createString(){
-        let str = "";
-        if(lowerChar == false && upperChar == false && number == false && symbol == false){
-            alert("Please check atleast one checkbox");
-            return;
-        }
-        if (lowerChar) str += lowerCaseArray;
-        if (upperChar) str += upperCaseArray;
-        if (number) str += numberArray;
-        if (symbol) str += symbolArray;
-        generatePassword(str);
+const Password = () => {
+  const [length, setLength] = useState(8);
+  const [spl, setSpl] = useState(false);
+  const [num, setNum] = useState(false);
+  const [password, setPassword] = useState("");
+  const inpRef = useRef(null);
+
+  // generate random password
+  const onGeneratePass = useCallback(() => {
+    const chars = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    const number = "0123456789";
+    const splChar = "!@#$%^&*()+_=+{}[]|";
+    let valid = chars;
+
+    if (spl) valid += splChar;
+    if (num) valid += number;
+    let genPass = "";
+    for (let index = 0; index < length; index++) {
+      let index = Math.floor(Math.random() * (valid.length - 1));
+      genPass += valid.charAt(index);
     }
+    setPassword(genPass);
+  }, [length, spl, num]);
 
-    //todo ----- extract password based on string -----
-    function generatePassword(str){
-        let password = "";
-        for (let i=0; i < length; i++){
-            password+= str[Math.floor(Math.random() * str.length)];
-        }
-        document.getElementById("password").value = password;
-    }
 
-  return (
-    <div className="container">
-      <h2>Generate Your Password</h2>
-      <div className="lengthContainer">
-        <p>
-          Select Password length <b>(8-50 characters)</b>
-        </p>
-        <input
-          type="number"
-          placeholder="Give a length from 8-50 character"
-          min={8}
-          max={50}
-          onChange={(e) => setLength(e.target.value)}
-        />
-      </div>
-      <h4>Click on Below Check-Boxes Of Your Wish</h4>
-      <div className="passwordOptions">
-        <div className="conditionContainer1">
-          <label htmlFor="lowercase">Include Lower Case Letters?</label>
-          <input
-            type="checkbox"
-            id="lowercase"
-            name="lowercase"
-            onClick={(e) => setLowerChar(e.target.checked)}
-          />
-          <br />
-          <label htmlFor="uppercase">Include Upper Case Letters?</label>
-          <input 
-            type="checkbox" 
-            id="uppercase" 
-            name="uppercase"
-            onClick={(e) => setUpperChar(e.target.checked)}
-           />
-          <br />
-        </div>
-        <div className="conditionContainer2">
-          <label htmlFor="number">Include Numbers?</label>
-          <input 
-                type="checkbox" 
-                id="lowercase" 
-                name="lowercase" 
-                onClick={(e) => setNumber(e.target.checked)}
-            />
-          <br />
-          <label htmlFor="symbol">Include Symbols?</label>
-          <input 
-            type="checkbox" 
-            id="uppercase" 
-            name="uppercase" 
-            onClick={(e) => setSymbol(e.target.checked)}
-        />
-          <br />
-        </div>
-      </div>
-      <button 
-        className="ready"
-        onClick = {createString}
-      >Generate Password</button>
-      <div className="readyPassword">
-        <input 
-            type="text" 
-            id = "password"
-            disabled 
-        />
-        <button
-            title="copy to clipboard"
-            onClick= {()=> {
-                navigator.clipboard.writeText(document.getElementById("password").value);
-                alert("Text copied to Clipboard.")
-            }}
-        >Copy</button>
-      </div>
-    </div>
-  );
-}
+   
+
+   return (
+     <div className=" flex flex-col font-serif border-2 border-black shadow-md shadow-black p-2 ">
+       <label className="m-5 bg-gray-300  p-3 rounded-md">
+         Length of Password :
+         <input
+           className="text-center mx-3 rounded-sm"
+           type="number"
+           value={length}
+           onChange={(e) => {
+             setLength(e.target.value);
+           }}
+         ></input>
+       </label>
+       <div className=" bg-green-300 p-3 rounded-md">
+         <label className="flex flex-row font-serif justify-items-center">
+           Include Special
+           <input
+             className="text-center rounded-sm mx-4"
+             type="checkbox"
+             value={length}
+             checke={spl}
+             onChange={(e) => {
+               setSpl(e.target.value);
+             }}
+           ></input>
+         </label>
+         <label className="flex flex-row font-serif justify-items-center">
+           Include Numbers
+           <input
+             className="text-center rounded-sm mx-4"
+             type="Checkbox"
+             value={length}
+             checked={num}
+             onChange={(e) => {
+               setNum(e.target.value);
+             }}
+           ></input>
+         </label>
+       </div>
+       <div className="flex justify-center items-center">
+         <button
+           className="p-4 bg-green-600 m-4 rounded-lg  hover:bg-green-300 hover:text-black"
+           onClick={onGeneratePass}
+         >
+           Generate Password
+         </button>
+       </div>
+       <strong className="p-3 bg-black rounded-sm text-white">
+         Generated Password:{" "}
+         <span
+           className="   
+        px-4 text-green-500"
+           ref={inpRef}
+         >
+           {password}
+         </span>
+       </strong>
+
+       <CopyToClipboard text={password}>
+         <button className="p-3 bg-gray-300 text-black-700 font-bold my-4 rounded-md">Copy to clipboard</button>
+       </CopyToClipboard>
+     </div>
+   );
+ };
+
+export default Password;
